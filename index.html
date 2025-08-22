@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FleetCo GPS Dashboard</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+}
+h1 {
+    text-align: center;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+.card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+.card-header {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+.card-content {
+    font-size: 14px;
+    color: #555;
+    word-wrap: break-word;
+}
+.timestamp {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 5px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>FleetCo GPS Data Dashboard</h1>
+    <div id="cardsContainer"></div>
+</div>
+
+<script>
+let lastLength = 0; // track how many entries we have displayed
+
+async function loadData() {
+    try {
+        const res = await fetch('fleetco_data.json?' + Date.now());
+        const data = await res.json();
+        const container = document.getElementById('cardsContainer');
+
+        // Only add new entries if array grew
+        if(data.length > lastLength){
+            const newData = data.slice(lastLength); // get only new entries
+            newData.forEach(entry => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">Device IP: ${entry.ip}</div>
+                    <div class="timestamp">Time (UTC): ${entry.time}</div>
+                    <div class="card-content"><strong>Raw Bytes:</strong> ${entry.raw_bytes}</div>
+                    <div class="card-content"><strong>Raw HEX:</strong> ${entry.raw_hex}</div>
+                `;
+                container.appendChild(card);
+            });
+            lastLength = data.length;
+        }
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+// Initial load
+loadData();
+
+// Refresh every 5 seconds
+setInterval(loadData, 5000);
+</script>
+</body>
+</html>
