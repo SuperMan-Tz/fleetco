@@ -1,8 +1,7 @@
 import socket
 
-HOST = "0.0.0.0"   # listen on all interfaces
-PORT = 5055        # same port you configure in Teltonika device
-
+HOST = "0.0.0.0"  
+PORT = 5055        
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((HOST, PORT))
 server_socket.listen()
